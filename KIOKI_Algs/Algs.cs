@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Drawing;
 
 namespace KIOKI_Algs
 {
     public static class Algs
     {
+        /* общие методы */
+
         private static char[,] GetEmptyMatrix(int rows, int columns)
         {
             char[,] tmp = new char[rows, columns];
@@ -34,6 +37,8 @@ namespace KIOKI_Algs
                 Console.Write('\n');
             }
         }
+
+        /* методы сортировки изгородью */
 
         private static char[,] getHedge(int messageLength, int key)
         {
@@ -91,6 +96,50 @@ namespace KIOKI_Algs
             return decryptedMessage;
         }
 
+        public static string? hedgeEncrypt(string message, int key)
+        {
+            if (key < 2 || message.Length < 2) return null;
+
+            string? encryptedMessage = null;
+
+            char[,] matrix = GetEmptyMatrix(key, message.Length);
+
+            int row = 0;
+            int delta = 0;
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                if (row == 0) delta = 1;
+                else if (row == key - 1) delta = -1;
+
+                matrix[row, i] = message[i];
+
+                row += delta;
+            }
+
+            for (int i = 0; i < key; i++)
+            {
+                for (int j = 0; j < message.Length; j++)
+                {
+                    if (matrix[i, j] != '\0') encryptedMessage += matrix[i, j];
+                }
+            }
+
+            return encryptedMessage;
+        }
+        public static string? hedgeDecrypt(string message, int key)
+        {
+            if (key < 2 || message.Length < 2) return null;
+
+            char[,] matrix = getHedge(message.Length, key);
+
+            matrix = fillHedge(matrix, message);
+
+            return getDecryptedMessage(matrix, key);
+        }
+
+        /* методы соритровки ключевой фразой */
+
         private static char[,] GetFilledKeyPhraseMatrix(char[,] matrix, string message)
         {
             for (int i = 0; i < matrix.GetLength(0); i++)
@@ -111,7 +160,7 @@ namespace KIOKI_Algs
             char[] keyPhrase = key.ToCharArray();
 
             int counter = 9999;
-            while(queue.Contains(0))
+            while (queue.Contains(0))
             {
                 int index = key.IndexOf(key.Max());
 
@@ -126,7 +175,7 @@ namespace KIOKI_Algs
 
             int min = queue.Min();
 
-            for(int i = 0; i < queue.GetLength(0); i++)
+            for (int i = 0; i < queue.GetLength(0); i++)
             {
                 queue[i] -= min;
             }
@@ -182,48 +231,6 @@ namespace KIOKI_Algs
             return result;
         }
 
-        public static string? hedgeEncrypt(string message, int key)
-        {
-            if (key < 2 || message.Length < 2) return null;
-
-            string? encryptedMessage = null;
-
-            char[,] matrix = GetEmptyMatrix(key, message.Length);
-
-            int row = 0;
-            int delta = 0;
-
-            for (int i = 0; i < message.Length; i++)
-            {
-                if (row == 0) delta = 1;
-                else if (row == key - 1) delta = -1;
-
-                matrix[row, i] = message[i];
-
-                row += delta;
-            }
-
-            for (int i = 0; i < key; i++)
-            {
-                for (int j = 0; j < message.Length; j++)
-                {
-                    if (matrix[i, j] != '\0') encryptedMessage += matrix[i, j];
-                }
-            }
-
-            return encryptedMessage;
-        }
-        public static string? hedgeDecrypt(string message, int key)
-        {
-            if (key < 2 || message.Length < 2) return null;
-
-            char[,] matrix = getHedge(message.Length, key);
-
-            matrix = fillHedge(matrix, message);
-
-            return getDecryptedMessage(matrix, key);
-        }
-
         public static string KeyPhraseEncrypt(string message, string key)
         {
             if (message.Length < 1) return "";
@@ -246,6 +253,35 @@ namespace KIOKI_Algs
             msg = GetFilledKeyPhraseMatrix(msg, message);
 
             return GetDecryptedKeyPhraseMessage(refMatrix, msg);
+        }
+
+        /* методы сортировки поворачивающейся решётки */
+
+        private static char[,] RotateGrate(char[,] grate)
+        {
+            char[,] rotated = new char[grate.GetLength(1), grate.GetLength(0)];
+
+            for (int i = 0; i < grate.GetLength(0); i++)
+            {
+                for (int j = 0; j < grate.GetLength(1); j++)
+                {
+                    rotated[j, grate.GetLength(1) - i - 1] = grate[i, j];   
+                }
+            }
+
+            return rotated;
+        }
+
+        public static string RotatingGrateEncrypt(string message, Point[] cells)
+        {
+            char[,] matrix = new char[4, 4];
+
+            return null;
+        }
+        public static string RotatingGrateDecrypt(string message, int[] grate)
+        {
+
+            return null;
         }
     }
 }
